@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 const pengurus = [
-  { nama: 'Bapak Ahmad Fauzi', jabatan: 'Ketua Umum', initials: 'AF', color: '#1A5C38' },
+  { nama: 'Bapak Bani Magribi', jabatan: 'Ketua Umum', initials: 'AF', color: '#1A5C38' },
   { nama: 'Ibu Siti Rahayu', jabatan: 'Sekretaris Umum', initials: 'SR', color: '#2E7D52' },
   { nama: 'Bapak Hendra Wijaya', jabatan: 'Bendahara', initials: 'HW', color: '#C89B3C' },
   { nama: 'Bapak Rudi Santoso', jabatan: 'Ketua Bidang Pembinaan', initials: 'RS', color: '#4A90A4' },
