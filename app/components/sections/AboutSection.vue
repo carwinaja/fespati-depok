@@ -46,7 +46,7 @@
           <div class="sec-details">
             <div class="sec-row">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span>Jl. Raya Depok No. 88, Pancoran Mas, Kota Depok 16436</span>
+              <span>Jl. Tampak Siring Raya No. 01 RT.04 RW.13 Kelurahan Limo Kecamatan Limo Kota Depok 16515</span>
             </div>
             <div class="sec-row">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.07 6.07l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -61,13 +61,7 @@
             Hubungi Kami →
           </a>
         </div>
-        <div class="sec-map">
-          <div class="map-placeholder">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <p class="small" style="margin-top:.5rem">Peta Lokasi</p>
-            <p class="small">Kota Depok, Jawa Barat</p>
-          </div>
-        </div>
+       <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.3212155820597!2d106.78134967504789!3d-6.352444962147568!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69efeb168f9871%3A0xaee375fd65bf5a9e!2sAl%20Ihsan%20Archery!5e0!3m2!1sid!2sid!4v1790670138486!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
 
       <!-- Pengurus -->
@@ -91,12 +85,14 @@
 
 <script setup lang="ts">
 const pengurus = [
-  { nama: 'Bapak Bani Magribi', jabatan: 'Ketua Umum', initials: 'AF', color: '#1A5C38' },
-  { nama: 'Ibu Siti Rahayu', jabatan: 'Sekretaris Umum', initials: 'SR', color: '#2E7D52' },
-  { nama: 'Bapak Hendra Wijaya', jabatan: 'Bendahara', initials: 'HW', color: '#C89B3C' },
-  { nama: 'Bapak Rudi Santoso', jabatan: 'Ketua Bidang Pembinaan', initials: 'RS', color: '#4A90A4' },
-  { nama: 'Ibu Dewi Kurniawati', jabatan: 'Ketua Bidang Humas', initials: 'DK', color: '#8B4513' },
-  { nama: 'Bapak Yusuf Amir', jabatan: 'Ketua Bidang Perlombaan', initials: 'YA', color: '#6B5B95' },
+  { nama: 'Bani Magribi', jabatan: 'Ketua', initials: 'BM', color: '#1A5C38' },
+  { nama: 'Anne Rufaidah', jabatan: 'Sekretaris', initials: 'AR', color: '#2E7D52' },
+  { nama: 'Hari Azhari', jabatan: 'Bendahara', initials: 'HA', color: '#C89B3C' },
+  { nama: 'Mochammad Effendy & Rika Yustini', jabatan: 'Bidang Organisasi', initials: 'MR', color: '#4A90A4' },
+  { nama: 'Ridjalena & Muzni Ikhsan', jabatan: 'Bidang Pembinaan & Prestasi', initials: 'RM', color: '#8B4513' },
+  { nama: 'Yuus Sadaputra & Tsabit Arra\'id', jabatan: 'Bidang Humas & Sosial Media', initials: 'YT', color: '#6B5B95' },
+  { nama: 'Carwin & Daris Muji Santoso', jabatan: 'Bidang Litbang', initials: 'CD', color: '#6B5B95' },
+  { nama: 'Faisal Yudho Prabowo & Andriningrum Sarnoko', jabatan: 'Bidang Perwasitan & Perlombaan', initials: 'FA', color: '#6B5B95' },
 ]
 </script>
 

@@ -35,10 +35,11 @@
           @click="openLightbox(photo)"
           @keypress.enter="openLightbox(photo)"
         >
-          <div class="photo-bg" :style="{ background: photo.color }">
-            <span class="photo-emoji" aria-hidden="true">{{ photo.emoji }}</span>
+          <div class="photo-bg" :style="{ background: photo.color || 'var(--color-surface-2)' }">
+            <img v-if="photo.src" :src="photo.src" :alt="photo.caption" loading="lazy" class="photo-img" />
+            <span v-else class="photo-emoji" aria-hidden="true">{{ photo.emoji }}</span>
             <div class="photo-overlay">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
             </div>
           </div>
           <div class="photo-caption">
@@ -53,10 +54,16 @@
         <div v-if="lightboxPhoto" class="lightbox" @click.self="closeLightbox" aria-modal="true" role="dialog" aria-label="Lightbox foto">
           <button class="lightbox-close" @click="closeLightbox" aria-label="Tutup">✕</button>
           <div class="lightbox-content">
-            <div class="lightbox-img" :style="{ background: lightboxPhoto.color }">
-              <span style="font-size:5rem">{{ lightboxPhoto.emoji }}</span>
+            <div class="lightbox-media">
+              <img v-if="lightboxPhoto.src" :src="lightboxPhoto.src" :alt="lightboxPhoto.caption" class="lightbox-img-real" />
+              <div v-else class="lightbox-img" :style="{ background: lightboxPhoto.color }">
+                <span style="font-size:5rem">{{ lightboxPhoto.emoji }}</span>
+              </div>
             </div>
-            <p class="lightbox-caption">{{ lightboxPhoto.caption }}</p>
+            <div class="lightbox-details">
+              <span class="badge badge-brand">{{ lightboxPhoto.category }}</span>
+              <p class="lightbox-caption">{{ lightboxPhoto.caption }}</p>
+            </div>
           </div>
         </div>
       </Teleport>
@@ -89,26 +96,33 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const categories = ['Semua', 'Latihan', 'Lomba', 'Silaturahmi']
+const categories = ['Semua', 'Lomba', 'Latihan', 'Silaturahmi']
 const activeCategory = ref('Semua')
 
 interface Photo {
   category: string
   caption: string
-  emoji: string
-  color: string
+  src?: string
+  emoji?: string
+  color?: string
   size?: string
 }
 
 const allPhotos: Photo[] = [
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok 2025', emoji: '🏆', color: '#1A5C38', size: 'span-2' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Pembukaan & Defile Atlet', src: '/pic-lmfd2/IMG_5799 (1).webp', size: 'span-2' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Sesi Kualifikasi Tembak', src: '/pic-lmfd2/IMG_5802.webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Konsentrasi Garis Tembak', src: '/pic-lmfd2/IMG_5851.webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Babak Eliminasi Perorangan', src: '/pic-lmfd2/IMG_5921.webp', size: 'span-2' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Aksi Pemanah Tradisional', src: '/pic-lmfd2/IMG_5924.webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Pertandingan Sengit', src: '/pic-lmfd2/IMG_6063 (1).webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Penilaian Poin Skoring Target', src: '/pic-lmfd2/IMG_6099.webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Final Kategori Usia', src: '/pic-lmfd2/IMG_6133.webp', size: 'span-2' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Penyerahan Medali Juara', src: '/pic-lmfd2/IMG_6159.webp' },
+  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Foto Bersama Pemenang & Official', src: '/pic-lmfd2/IMG_6345.webp' },
   { category: 'Latihan', caption: 'Sesi latihan bersama Sabtu pagi', emoji: '🎯', color: '#2E7D52' },
   { category: 'Latihan', caption: 'Teknik memanah klub Panah Asri', emoji: '🏹', color: '#4A8F5C' },
-  { category: 'Silaturahmi', caption: 'Halal bihalal anggota FESPATI 2025', emoji: '🤝', color: '#C89B3C', size: 'span-2' },
-  { category: 'Lomba', caption: 'Finalis kategori putra dewasa', emoji: '🥇', color: '#8B6914' },
-  { category: 'Latihan', caption: 'Latihan perdana anggota baru', emoji: '🌱', color: '#3D7A55' },
+  { category: 'Silaturahmi', caption: 'Halal bihalal anggota FESPATI 2025', emoji: '🤝', color: '#C89B3C' },
   { category: 'Silaturahmi', caption: 'Jalan sehat FESPATI Depok 2025', emoji: '🚶', color: '#6B5B95' },
-  { category: 'Lomba', caption: 'Penyerahan hadiah juara 1', emoji: '🎖️', color: '#C25B92' },
 ]
 
 const filteredPhotos = computed(() => {
@@ -174,7 +188,7 @@ const videos = [
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 200px;
+  grid-auto-rows: 220px;
   gap: 0.75rem;
   margin-bottom: 3rem;
 }
@@ -185,6 +199,13 @@ const videos = [
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.photo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
 .photo-item.span-2 {
@@ -198,10 +219,18 @@ const videos = [
   justify-content: center;
   position: relative;
   overflow: hidden;
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transition: transform var(--transition);
 }
 
-.photo-item:hover .photo-bg { transform: scale(1.02); }
+.photo-item:hover .photo-img {
+  transform: scale(1.06);
+}
 
 .photo-emoji {
   font-size: 3.5rem;
@@ -214,13 +243,14 @@ const videos = [
 .photo-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity var(--transition);
   color: white;
+  backdrop-filter: blur(2px);
 }
 
 .photo-item:hover .photo-overlay { opacity: 1; }
@@ -240,6 +270,7 @@ const videos = [
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 /* Lightbox */
@@ -247,51 +278,88 @@ const videos = [
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  animation: fadeUp 0.2s ease;
+  z-index: 999;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .lightbox-close {
   position: absolute;
-  top: 1rem;
+  top: 1.5rem;
   right: 1.5rem;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background var(--transition);
+  z-index: 1000;
 }
 
-.lightbox-close:hover { background: rgba(255,255,255,0.2); }
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
 
 .lightbox-content {
-  max-width: 600px;
-  width: 90vw;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-media {
+  width: 100%;
+  max-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.lightbox-img-real {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
 .lightbox-img {
-  border-radius: var(--radius-xl);
+  width: 100%;
   height: 360px;
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.lightbox-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
 .lightbox-caption {
   color: white;
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 /* Video */
