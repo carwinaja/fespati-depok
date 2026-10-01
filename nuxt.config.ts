@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils'],
+  modules: ['nuxt-auth-utils', '@nuxt/fonts'],
   srcDir: 'app/',
   serverDir: 'server',
   components: [
@@ -26,22 +26,27 @@ export default defineNuxtConfig({
         { property: 'og:description', content: 'Pusat informasi panahan tradisional Kota Depok. Bergabunglah bersama kami.' },
         { property: 'og:type', content: 'website' },
       ],
-      link: [
-        {
-          rel: 'preconnect',
-          href: 'https://fonts.googleapis.com',
-        },
-        {
-          rel: 'preconnect',
-          href: 'https://fonts.gstatic.com',
-          crossorigin: '',
-        },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap',
-        },
-      ],
     },
+  },
+  // Font di-host sendiri saat build (tanpa permintaan ke Google Fonts saat runtime)
+  fonts: {
+    defaults: { subsets: ['latin', 'latin-ext'] }, // teks bahasa Indonesia
+    families: [
+      { name: 'Inter', provider: 'google', weights: [400, 500, 600, 700, 800] },
+      { name: 'Playfair Display', provider: 'google', weights: [700, 800] },
+    ],
+  },
+  // Sesi hanya dimuat di halaman admin (middleware memanggil refresh()). Tanpa ini
+  // setiap render halaman publik ikut mengambil sesi, dan ISR tidak aman.
+  auth: { loadStrategy: 'none' },
+  routeRules: {
+    // Halaman publik disajikan dari CDN (ISR) agar tidak kena cold start / render per kunjungan
+    '/': { isr: 60 },
+    '/berita/**': { isr: 300 },
+    // Aset statis di public/ (nama tidak ber-hash): cache 7 hari
+    '/hero-fespati.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
+    '/fespati.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
+    '/logo-club/**': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
   },
   nitro: {
     // sanitize-html (CJS) me-require htmlparser2 (ESM-only). Node tanpa require(esm)
