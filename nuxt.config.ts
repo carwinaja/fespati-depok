@@ -43,6 +43,11 @@ export default defineNuxtConfig({
       ],
     },
   },
+  nitro: {
+    // sanitize-html (CJS) me-require htmlparser2 (ESM-only). Node tanpa require(esm)
+    // (mis. runtime Vercel) gagal dengan ERR_REQUIRE_ESM, jadi bundle keduanya saat build.
+    externals: { inline: ['sanitize-html', 'htmlparser2'] },
+  },
   runtimeConfig: {
     databaseUrl: process.env.DATABASE_URL || process.env.app_db,
     s3AccessKey: process.env.s3_access_key,
