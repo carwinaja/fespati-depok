@@ -21,9 +21,6 @@
           <a v-for="item in navItems" :key="item.href" :href="item.href" class="nav-link" @click="mobileOpen = false">
             {{ item.label }}
           </a>
-          <div class="nav-cta">
-            <a href="#daftar" class="btn btn-primary" @click="mobileOpen = false">Daftar Anggota →</a>
-          </div>
         </div>
 
         <!-- Mobile Toggle Button -->
@@ -50,10 +47,10 @@ const mobileOpen = ref(false)
 const isScrolled = ref(false)
 
 const navItems = [
-  { label: 'Tentang Kami', href: '#tentang' },
-  { label: 'Klub & Anggota', href: '#klub' },
-  { label: 'Agenda', href: '#agenda' },
   { label: 'Galeri', href: '#galeri' },
+  { label: 'Agenda', href: '#agenda' },
+  { label: 'Klub & Anggota', href: '#klub' },
+  { label: 'Tentang Kami', href: '#tentang' },
   { label: 'Berita', href: '#berita' },
 ]
 
@@ -187,10 +184,6 @@ onUnmounted(() => {
   color: var(--color-brand);
 }
 
-.nav-cta {
-  margin-left: auto;
-}
-
 /* Mobile Toggle Button */
 .mobile-toggle {
   display: none;
@@ -286,20 +279,6 @@ onUnmounted(() => {
 
   .nav-link:last-of-type {
     border-bottom: none;
-  }
-
-  .nav-cta {
-    margin-left: 0;
-    margin-top: 1.5rem;
-    width: 100%;
-  }
-
-  .nav-cta .btn {
-    width: 100%;
-    padding: 0.85rem;
-    font-size: 1rem;
-    justify-content: center;
-    text-align: center;
   }
 }
 </style>

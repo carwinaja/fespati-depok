@@ -35,7 +35,8 @@
         aria-labelledby="tab-internal"
         class="agenda-list"
       >
-        <div v-for="event in internalEvents" :key="event.nama" class="event-card card">
+        <p v-if="!internalEvents.length" class="small">Belum ada agenda.</p>
+        <div v-for="event in internalEvents" :key="event.id" class="event-card card">
           <div class="event-date-col">
             <span class="event-day">{{ event.day }}</span>
             <span class="event-month">{{ event.month }}</span>
@@ -55,7 +56,11 @@
                 {{ event.kategori }}
               </span>
             </div>
-            <p class="event-desc">{{ event.desc }}</p>
+            <p v-if="event.desc" class="event-desc">{{ event.desc }}</p>
+            <div v-if="event.reg || event.pdf" class="event-links">
+              <a v-if="event.reg" :href="event.reg" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Daftar →</a>
+              <a v-if="event.pdf" :href="event.pdf" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Unduh PDF</a>
+            </div>
           </div>
         </div>
       </div>
@@ -68,7 +73,8 @@
         aria-labelledby="tab-external"
         class="agenda-list"
       >
-        <div v-for="event in externalEvents" :key="event.nama" class="event-card card">
+        <p v-if="!externalEvents.length" class="small">Belum ada agenda.</p>
+        <div v-for="event in externalEvents" :key="event.id" class="event-card card">
           <div class="event-date-col">
             <span class="event-day">{{ event.day }}</span>
             <span class="event-month">{{ event.month }}</span>
@@ -88,7 +94,11 @@
                 {{ event.kategori }}
               </span>
             </div>
-            <p class="event-desc">{{ event.desc }}</p>
+            <p v-if="event.desc" class="event-desc">{{ event.desc }}</p>
+            <div v-if="event.reg || event.pdf" class="event-links">
+              <a v-if="event.reg" :href="event.reg" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Daftar →</a>
+              <a v-if="event.pdf" :href="event.pdf" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Unduh PDF</a>
+            </div>
           </div>
         </div>
       </div>
@@ -97,82 +107,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 const activeTab = ref('internal')
 
-const tabs = [
-  { id: 'internal', label: 'Lomba Internal Kota', count: 3 },
-  { id: 'external', label: 'Undangan Luar Kota / Nasional', count: 4 },
-]
+const { data } = await useFetch('/api/events')
 
-const internalEvents = [
-  {
-    day: '15', month: 'Okt 2026',
-    nama: 'Kejuaraan Panahan Tradisional Kota Depok 2026',
-    lokasi: 'Lapangan Merdeka, Depok',
-    kategori: 'Semua Kategori',
-    status: 'Terbuka',
-    statusClass: 'badge-brand',
-    desc: 'Kompetisi tahunan antar klub FESPATI Depok yang diperebutkan gelar juara kota.',
-  },
-  {
-    day: '22', month: 'Nov 2026',
-    nama: 'Latber Bulanan FESPATI Depok',
-    lokasi: 'Lapangan GOR Depok',
-    kategori: 'Anggota Aktif',
-    status: 'Terbuka',
-    statusClass: 'badge-brand',
-    desc: 'Latihan bersama bulanan untuk mempererat silaturahmi antar anggota.',
-  },
-  {
-    day: '20', month: 'Des 2026',
-    nama: 'Panahan Tradisional Cup Akhir Tahun',
-    lokasi: 'Stadion Persikad, Depok',
-    kategori: 'Open',
-    status: 'Akan Datang',
-    statusClass: 'badge-gold',
-    desc: 'Penutup tahun dengan turnamen seru dan hadiah menarik dari sponsor.',
-  },
-]
+const STATUS: Record<string, { label: string; cls: string }> = {
+  UPCOMING: { label: 'Akan Datang', cls: 'badge-gold' },
+  ONGOING: { label: 'Berlangsung', cls: 'badge-brand' },
+  DONE: { label: 'Berakhir', cls: 'badge-closed' },
+}
 
-const externalEvents = [
-  {
-    day: '05', month: 'Nov 2026',
-    nama: 'Kejuaraan Nasional Panahan Tradisional 2026',
-    lokasi: 'GOR Senayan, Jakarta',
-    kategori: 'Nasional',
-    status: 'Terbuka',
-    statusClass: 'badge-brand',
-    desc: 'Ajang bergengsi tingkat nasional. FESPATI Depok mengirimkan delegasi terbaik.',
-  },
-  {
-    day: '18', month: 'Nov 2026',
-    nama: 'Open Tournament Panahan Bogor 2026',
-    lokasi: 'Kota Bogor, Jawa Barat',
-    kategori: 'Regional Jabar',
-    status: 'Terbuka',
-    statusClass: 'badge-brand',
-    desc: 'Turnamen terbuka se-Jabar. Pendaftaran melalui sekretariat klub masing-masing.',
-  },
-  {
-    day: '10', month: 'Des 2026',
-    nama: 'Kejurda Jawa Barat 2026',
-    lokasi: 'Bandung, Jawa Barat',
-    kategori: 'Provinsi',
-    status: 'Akan Datang',
-    statusClass: 'badge-gold',
-    desc: 'Kejuaraan daerah Jawa Barat untuk menentukan wakil ke Kejurnas.',
-  },
-  {
-    day: '28', month: 'Sep 2026',
-    nama: 'Undangan Lomba Bekasi Traditional Archery',
-    lokasi: 'Kota Bekasi',
-    kategori: 'Kota',
-    status: 'Berakhir',
-    statusClass: 'badge-closed',
-    desc: 'Undangan dari FESPATI Bekasi. Pendaftaran telah ditutup.',
-  },
-]
+const toCard = (e: any) => ({
+  id: e.id,
+  day: formatDate(e.eventDate, { day: '2-digit' }),
+  month: formatDate(e.eventDate, { month: 'short', year: 'numeric' }),
+  nama: e.title,
+  lokasi: e.location,
+  kategori: `${formatDate(e.eventDate, { day: 'numeric', month: 'long', year: 'numeric' })}, ${formatTime(e.eventDate)}`,
+  status: STATUS[e.status]?.label ?? e.status,
+  statusClass: STATUS[e.status]?.cls ?? 'badge-brand',
+  desc: e.description,
+  reg: e.status === 'DONE' ? null : e.registrationUrl,
+  pdf: e.pdfUrl,
+  done: e.status === 'DONE',
+  at: new Date(e.eventDate).getTime(),
+})
+
+// Yang masih berjalan/akan datang di atas (terdekat dulu), yang selesai di bawah (terbaru dulu)
+const byType = (type: string) =>
+  (data.value ?? []).filter((e: any) => e.type === type).map(toCard)
+    .sort((a, b) => (a.done !== b.done ? Number(a.done) - Number(b.done) : a.done ? b.at - a.at : a.at - b.at))
+
+const internalEvents = computed(() => byType('INTERNAL'))
+const externalEvents = computed(() => byType('EXTERNAL'))
+
+const tabs = computed(() => [
+  { id: 'internal', label: 'Lomba Internal Kota', count: internalEvents.value.length },
+  { id: 'external', label: 'Undangan Luar Kota / Nasional', count: externalEvents.value.length },
+])
 </script>
 
 <style scoped>
@@ -327,4 +300,6 @@ const externalEvents = [
   .event-day { font-size: 1.1rem; }
   .agenda-tabs { flex-direction: column; width: 100%; }
 }
+.event-links { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.btn-sm { padding: .35rem .9rem; }
 </style>

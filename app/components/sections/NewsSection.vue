@@ -1,5 +1,5 @@
 <template>
-  <section id="berita" class="news-section section" style="background: var(--color-surface-2)">
+  <section id="berita" class="news-section section">
     <div class="container">
       <div class="section-header">
         <span class="label" style="color:var(--color-brand)">Berita & Edukasi</span>
@@ -9,44 +9,44 @@
         </p>
       </div>
 
+      <p v-if="!featured && !articles.length" class="small" style="text-align:center">Artikel segera hadir.</p>
+
       <!-- Featured article -->
-      <div class="featured-article card">
+      <div v-if="featured" class="featured-article card">
         <div class="featured-thumb" style="background: linear-gradient(135deg, #1A5C38 0%, #2E7D52 100%)">
-          <span class="featured-emoji" aria-hidden="true">🏹</span>
+          <img v-if="featured.thumbnailUrl" :src="featured.thumbnailUrl" :alt="featured.title" class="thumb-img" />
+          <span v-else class="featured-emoji" aria-hidden="true">🏹</span>
           <div class="featured-overlay">
             <span class="badge badge-gold">Artikel Unggulan</span>
           </div>
         </div>
         <div class="featured-body">
           <div class="article-meta">
-            <span class="badge badge-brand">Tips Panahan</span>
-            <span class="small">25 September 2026</span>
-            <span class="small">oleh Tim Redaksi FESPATI</span>
+            <span class="badge badge-brand">{{ featured.category }}</span>
+            <span class="small">{{ formatDate(featured.publishedAt, { day: 'numeric', month: 'long', year: 'numeric' }) }}</span>
+            <span class="small">oleh {{ featured.author }}</span>
           </div>
-          <h2 class="h3 featured-title">
-            5 Teknik Dasar Panahan Tradisional yang Wajib Dikuasai Pemanah Pemula
-          </h2>
-          <p class="lead" style="font-size:.9rem">
-            Panahan tradisional memiliki teknik dan filosofi tersendiri yang berbeda dari panahan modern. Pelajari 5 fondasi utama yang akan membantu perjalananmu sebagai pemanah tradisional.
-          </p>
-          <a href="#" class="btn btn-primary" style="margin-top:1rem">Baca Selengkapnya →</a>
+          <h2 class="h3 featured-title">{{ featured.title }}</h2>
+          <p v-if="featured.excerpt" class="lead" style="font-size:.9rem">{{ featured.excerpt }}</p>
+          <NuxtLink :to="`/berita/${featured.slug}`" class="btn btn-primary" style="margin-top:1rem">Baca Selengkapnya →</NuxtLink>
         </div>
       </div>
 
       <!-- Article grid -->
-      <div class="article-grid">
-        <article v-for="article in articles" :key="article.title" class="article-card card">
-          <div class="article-thumb" :style="{ background: article.color }">
-            <span class="article-emoji" aria-hidden="true">{{ article.emoji }}</span>
+      <div v-if="articles.length" class="article-grid">
+        <article v-for="article in articles" :key="article.id" class="article-card card">
+          <div class="article-thumb" style="background: linear-gradient(135deg, #1A5C38 0%, #2E7D52 100%)">
+            <img v-if="article.thumbnailUrl" :src="article.thumbnailUrl" :alt="article.title" class="thumb-img" loading="lazy" />
+            <span v-else class="article-emoji" aria-hidden="true">🏹</span>
           </div>
           <div class="article-body">
             <div class="article-meta">
-              <span class="badge" :class="article.badgeClass">{{ article.category }}</span>
-              <span class="small">{{ article.date }}</span>
+              <span class="badge badge-brand">{{ article.category }}</span>
+              <span class="small">{{ date(article.publishedAt) }}</span>
             </div>
             <h3 class="article-title">{{ article.title }}</h3>
-            <p class="article-excerpt">{{ article.excerpt }}</p>
-            <a href="#" class="btn-ghost" style="font-size:.8rem">Baca →</a>
+            <p v-if="article.excerpt" class="article-excerpt">{{ article.excerpt }}</p>
+            <NuxtLink :to="`/berita/${article.slug}`" class="btn-ghost" style="font-size:.8rem">Baca →</NuxtLink>
           </div>
         </article>
       </div>
@@ -55,62 +55,11 @@
 </template>
 
 <script setup lang="ts">
-const articles = [
-  {
-    category: 'Liputan',
-    badgeClass: 'badge-brand',
-    date: '18 Sep 2026',
-    title: 'FESPATI Depok Raih 3 Medali di Kejurda Jawa Barat 2026',
-    excerpt: 'Tiga atlet terbaik FESPATI Depok berhasil naik podium di kejuaraan daerah tingkat Jawa Barat yang berlangsung di Bandung.',
-    emoji: '🥇',
-    color: '#1A5C38',
-  },
-  {
-    category: 'Tips Panahan',
-    badgeClass: 'badge-gold',
-    date: '10 Sep 2026',
-    title: 'Memilih Busur Tradisional yang Tepat untuk Pemula',
-    excerpt: 'Panduan lengkap memilih jenis busur tradisional yang sesuai dengan postur tubuh, budget, dan tujuan berlatih.',
-    emoji: '🏹',
-    color: '#C89B3C',
-  },
-  {
-    category: 'Liputan',
-    badgeClass: 'badge-brand',
-    date: '01 Sep 2026',
-    title: 'Latber Agustus: 120 Anggota Berkumpul di GOR Depok',
-    excerpt: 'Latihan bersama bulanan kali ini dihadiri rekor peserta terbanyak sepanjang sejarah FESPATI Depok.',
-    emoji: '🤝',
-    color: '#2E7D52',
-  },
-  {
-    category: 'Tips Panahan',
-    badgeClass: 'badge-gold',
-    date: '22 Agu 2026',
-    title: 'Filosofi di Balik Panahan Tradisional Nusantara',
-    excerpt: 'Lebih dari sekedar olahraga, panahan tradisional adalah perpaduan seni, meditasi, dan kearifan leluhur.',
-    emoji: '📿',
-    color: '#6B5B95',
-  },
-  {
-    category: 'Liputan',
-    badgeClass: 'badge-brand',
-    date: '15 Agu 2026',
-    title: 'Pelatihan Juri Panahan Tradisional Sertifikasi PABSI',
-    excerpt: 'FESPATI Depok mengadakan pelatihan juri bersertifikasi nasional bagi anggota yang ingin menjadi wasit resmi.',
-    emoji: '📋',
-    color: '#4A90A4',
-  },
-  {
-    category: 'Tips Panahan',
-    badgeClass: 'badge-gold',
-    date: '05 Agu 2026',
-    title: 'Cara Merawat Busur Bambu agar Tahan Lama',
-    excerpt: 'Tips praktis dari para pengrajin busur tradisional tentang cara merawat, menyimpan, dan memperbaiki busur bambu.',
-    emoji: '🌿',
-    color: '#8B4513',
-  },
-]
+const { data } = await useFetch('/api/articles')
+
+const featured = computed(() => (data.value ?? []).find((a: any) => a.isFeatured) ?? null)
+const articles = computed(() => (data.value ?? []).filter((a: any) => a.id !== featured.value?.id).slice(0, 6))
+const date = (iso: string) => formatDate(iso)
 </script>
 
 <style scoped>
@@ -217,4 +166,7 @@ const articles = [
 @media (max-width: 600px) {
   .article-grid { grid-template-columns: 1fr; }
 }
+.featured-thumb, .article-thumb { position: relative; overflow: hidden; }
+.thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.featured-overlay { z-index: 1; }
 </style>

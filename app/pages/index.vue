@@ -4,10 +4,10 @@
 
     <main id="main-content">
       <HeroSection />
-      <AboutSection />
-      <ClubsSection />
-      <AgendaSection />
       <GallerySection />
+      <AgendaSection />
+      <ClubsSection />
+      <AboutSection />
       <NewsSection />
       <CtaBanner />
     </main>
