@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-const { data } = await useFetch('/api/articles')
+const data = await useSectionData('/api/articles')
 
 const featured = computed(() => (data.value ?? []).find((a: any) => a.isFeatured) ?? null)
 const articles = computed(() => (data.value ?? []).filter((a: any) => a.id !== featured.value?.id).slice(0, 6))

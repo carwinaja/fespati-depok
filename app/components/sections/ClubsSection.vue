@@ -68,7 +68,7 @@ import { ref, computed } from 'vue'
 
 const imageErrors = ref({})
 
-const { data } = await useFetch('/api/clubs')
+const data = await useSectionData('/api/clubs')
 const clubs = computed(() =>
   (data.value ?? []).map((c) => ({
     key: c.id, name: c.name, logo: c.logoUrl, colorHex: c.colorHex,
