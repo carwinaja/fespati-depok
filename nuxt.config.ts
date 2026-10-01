@@ -1,11 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  modules: ['nuxt-auth-utils'],
   srcDir: 'app/',
+  serverDir: 'server',
   components: [
     { path: '~/components/sections', pathPrefix: false },
     '~/components'
   ],
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/prose.css'],
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   app: {

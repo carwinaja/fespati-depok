@@ -44,7 +44,6 @@
           <ul>
             <li><a href="#klub">Daftar Klub</a></li>
             <li><a href="#daftar">Cara Daftar Anggota</a></li>
-            <li><a href="#klub">Jadwal Latihan</a></li>
           </ul>
         </div>
         <div class="footer-col">

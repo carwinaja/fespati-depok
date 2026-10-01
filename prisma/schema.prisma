@@ -12,7 +12,8 @@ model Admin {
   email     String   @unique
   name      String
   password  String
-  role      String   @default("ADMIN")
+  role      String   @default("ADMIN") // SUPER_ADMIN | ADMIN
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -26,6 +27,8 @@ model Club {
   location    String
   schedule    String
   description String?
+  mapUrl      String?
+  colorHex    String?
   members     Member[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -41,6 +44,8 @@ model Member {
   status    String   @default("ACTIVE")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([clubId])
 }
 
 enum EventType {
@@ -58,8 +63,11 @@ model Event {
   pdfUrl          String?
   registrationUrl String?
   status          String    @default("UPCOMING")
+  galleries       Gallery[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([eventDate])
 }
 
 enum MediaType {
@@ -75,8 +83,12 @@ model Gallery {
   mediaUrl    String?
   youtubeUrl  String?
   description String?
+  eventId     String?
+  event       Event?    @relation(fields: [eventId], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([eventId])
 }
 
 model Article {
@@ -84,11 +96,15 @@ model Article {
   title        String
   slug         String   @unique
   category     String
+  excerpt      String?
   content      String   @db.Text
   thumbnailUrl String?
   author       String   @default("Admin FESPATI")
-  isPublished  Boolean  @default(true)
+  isPublished  Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
   publishedAt  DateTime @default(now())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([publishedAt])
 }

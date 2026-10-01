@@ -10,7 +10,7 @@
       </div>
 
       <!-- Category filter -->
-      <div class="galeri-filter">
+      <div v-if="categories.length > 2" class="galeri-filter">
         <button
           v-for="cat in categories"
           :key="cat"
@@ -23,6 +23,7 @@
       </div>
 
       <!-- Photo grid -->
+      <p v-if="!filteredPhotos.length" class="small" style="text-align:center">Galeri segera hadir.</p>
       <div class="photo-grid">
         <div
           v-for="(photo, i) in filteredPhotos"
@@ -69,24 +70,21 @@
       </Teleport>
 
       <!-- Video section -->
-      <div class="video-section">
-        <h3 class="h3" style="margin-bottom:1.25rem">Video Teknik Dasar</h3>
+      <div v-if="videos.length" class="video-section">
+        <h3 class="h3" style="margin-bottom:1.25rem">Video</h3>
         <div class="video-grid">
-          <div v-for="video in videos" :key="video.title" class="video-card card">
-            <div class="video-thumb" :style="{ background: video.color }">
-              <div class="play-btn" aria-label="Putar video">
+          <a v-for="video in videos" :key="video.id" :href="video.url" target="_blank" rel="noopener" class="video-card card" :aria-label="`Putar video ${video.title}`">
+            <div class="video-thumb" style="background: var(--color-brand)">
+              <img v-if="video.thumb" :src="video.thumb" :alt="video.title" loading="lazy" class="video-img" />
+              <div class="play-btn" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
               </div>
-              <span class="video-emoji" aria-hidden="true">{{ video.emoji }}</span>
             </div>
             <div class="video-info">
               <p class="video-title">{{ video.title }}</p>
-              <p class="video-duration">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                {{ video.duration }}
-              </p>
+              <p class="video-duration">{{ video.category }}</p>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -96,39 +94,28 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const categories = ['Semua', 'Lomba', 'Latihan', 'Silaturahmi']
+interface Photo { category: string; caption: string; src?: string | null; emoji?: string; color?: string; size?: string }
+
+const { data } = await useFetch('/api/gallery')
+
+const allPhotos = computed<Photo[]>(() =>
+  (data.value ?? []).filter((g: any) => g.mediaType === 'PHOTO' && g.mediaUrl)
+    .map((g: any) => ({ category: g.category, caption: g.event?.title ? `${g.event.title} - ${g.title}` : g.title, src: g.mediaUrl })),
+)
+const videos = computed(() =>
+  (data.value ?? []).filter((g: any) => g.mediaType === 'VIDEO' && g.youtubeUrl)
+    .map((g: any) => {
+      const id = youtubeId(g.youtubeUrl)
+      return { id: g.id, title: g.title, category: g.category, url: g.youtubeUrl, thumb: id ? `https://i.ytimg.com/vi/${id}/mqdefault.jpg` : null }
+    }),
+)
+
+const categories = computed(() => ['Semua', ...new Set(allPhotos.value.map((p) => p.category))])
 const activeCategory = ref('Semua')
 
-interface Photo {
-  category: string
-  caption: string
-  src?: string
-  emoji?: string
-  color?: string
-  size?: string
-}
-
-const allPhotos: Photo[] = [
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Pembukaan & Defile Atlet', src: '/pic-lmfd2/IMG_5799 (1).webp', size: 'span-2' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Sesi Kualifikasi Tembak', src: '/pic-lmfd2/IMG_5802.webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Konsentrasi Garis Tembak', src: '/pic-lmfd2/IMG_5851.webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Babak Eliminasi Perorangan', src: '/pic-lmfd2/IMG_5921.webp', size: 'span-2' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Aksi Pemanah Tradisional', src: '/pic-lmfd2/IMG_5924.webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Pertandingan Sengit', src: '/pic-lmfd2/IMG_6063 (1).webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Penilaian Poin Skoring Target', src: '/pic-lmfd2/IMG_6099.webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Final Kategori Usia', src: '/pic-lmfd2/IMG_6133.webp', size: 'span-2' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Penyerahan Medali Juara', src: '/pic-lmfd2/IMG_6159.webp' },
-  { category: 'Lomba', caption: 'Kejuaraan Kota Depok - Foto Bersama Pemenang & Official', src: '/pic-lmfd2/IMG_6345.webp' },
-  { category: 'Latihan', caption: 'Sesi latihan bersama Sabtu pagi', emoji: '🎯', color: '#2E7D52' },
-  { category: 'Latihan', caption: 'Teknik memanah klub Panah Asri', emoji: '🏹', color: '#4A8F5C' },
-  { category: 'Silaturahmi', caption: 'Halal bihalal anggota FESPATI 2025', emoji: '🤝', color: '#C89B3C' },
-  { category: 'Silaturahmi', caption: 'Jalan sehat FESPATI Depok 2025', emoji: '🚶', color: '#6B5B95' },
-]
-
-const filteredPhotos = computed(() => {
-  if (activeCategory.value === 'Semua') return allPhotos
-  return allPhotos.filter(p => p.category === activeCategory.value)
-})
+const filteredPhotos = computed(() =>
+  activeCategory.value === 'Semua' ? allPhotos.value : allPhotos.value.filter((p) => p.category === activeCategory.value),
+)
 
 const lightboxPhoto = ref<Photo | null>(null)
 
@@ -141,13 +128,6 @@ function closeLightbox() {
   lightboxPhoto.value = null
   document.body.style.overflow = ''
 }
-
-const videos = [
-  { title: 'Teknik Memegang Busur yang Benar', duration: '8:24', emoji: '🏹', color: '#1A5C38' },
-  { title: 'Cara Melepas Anak Panah (Thumb Release)', duration: '6:15', emoji: '🎯', color: '#C89B3C' },
-  { title: 'Postur & Sikap Dasar Pemanah Tradisional', duration: '10:02', emoji: '🧘', color: '#2E7D52' },
-  { title: 'Perawatan Busur Tradisional', duration: '5:38', emoji: '🔧', color: '#8B4513' },
-]
 </script>
 
 <style scoped>
@@ -430,4 +410,7 @@ const videos = [
 @media (max-width: 480px) {
   .photo-grid { grid-template-columns: 1fr; }
 }
+.video-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.video-thumb .play-btn { position: relative; z-index: 1; }
+a.video-card { display: block; }
 </style>
