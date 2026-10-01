@@ -41,4 +41,13 @@ export default defineNuxtConfig({
       ],
     },
   },
+  runtimeConfig: {
+    databaseUrl: process.env.DATABASE_URL || process.env.app_db,
+    s3AccessKey: process.env.s3_access_key,
+    s3SecretKey: process.env.s3_secret_key,
+    s3Endpoint: process.env.S3_ENDPOINT,
+    s3BucketName: process.env.S3_BUCKET_NAME || 'fespatistorage-idnhpb',
+    s3Region: process.env.S3_REGION || 'us-east-1',
+  }
 })
+

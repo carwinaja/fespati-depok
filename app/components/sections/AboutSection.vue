@@ -61,7 +61,7 @@
             Hubungi Kami →
           </a>
         </div>
-       <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.3212155820597!2d106.78134967504789!3d-6.352444962147568!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69efeb168f9871%3A0xaee375fd65bf5a9e!2sAl%20Ihsan%20Archery!5e0!3m2!1sid!2sid!4v1790670138486!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+       <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.3212155820597!2d106.78134967504789!3d-6.352444962147568!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69efeb168f9871%3A0xaee375fd65bf5a9e!2sAl%20Ihsan%20Archery!5e0!3m2!1sid!2sid!4v179cd0670138486!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
 
       <!-- Pengurus -->
