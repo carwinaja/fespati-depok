@@ -110,7 +110,7 @@
 import { ref, computed } from 'vue'
 const activeTab = ref('internal')
 
-const { data } = await useFetch('/api/events')
+const data = await useSectionData('/api/events')
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   UPCOMING: { label: 'Akan Datang', cls: 'badge-gold' },

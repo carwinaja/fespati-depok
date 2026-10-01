@@ -96,7 +96,7 @@ import { ref, computed } from 'vue'
 
 interface Photo { category: string; caption: string; src?: string | null; emoji?: string; color?: string; size?: string }
 
-const { data } = await useFetch('/api/gallery')
+const data = await useSectionData('/api/gallery')
 
 const allPhotos = computed<Photo[]>(() =>
   (data.value ?? []).filter((g: any) => g.mediaType === 'PHOTO' && g.mediaUrl)

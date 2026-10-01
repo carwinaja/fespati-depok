@@ -21,7 +21,8 @@
 <script setup lang="ts">
 const slug = useRoute().params.slug as string
 const { data: article, error } = await useFetch(`/api/articles/${slug}`)
-if (error.value || !article.value) throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan', fatal: true })
+if (error.value) throwTemporarilyUnavailable(error.value.statusCode)
+if (!article.value) throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan', fatal: true })
 
 useHead({
   title: `${article.value.title} — FESPATI Depok`,
