@@ -27,7 +27,7 @@
           <label>Foto</label><AdminImageUpload v-model="form.mediaUrl" />
         </template>
         <template v-else>
-          <label for="files">Foto (bisa pilih banyak sekaligus, maks. 5 MB per foto)</label>
+          <label for="files">Foto (bisa pilih banyak sekaligus; otomatis dikecilkan agar situs cepat)</label>
           <input id="files" ref="filesEl" type="file" multiple accept="image/webp,image/jpeg,image/png" class="input" />
         </template>
       </div>
@@ -95,11 +95,6 @@ function edit(g: any) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-async function upload(file: File) {
-  const fd = new FormData(); fd.append('file', file)
-  return (await $fetch<{ url: string }>('/api/admin/upload', { method: 'POST', body: fd })).url
-}
-
 async function save() {
   error.value = ''; info.value = ''; busy.value = true
   try {
@@ -112,7 +107,7 @@ async function save() {
       let ok = 0
       for (const f of files) {
         try {
-          const mediaUrl = await upload(f)
+          const mediaUrl = await uploadImage(f)
           await $fetch('/api/admin/gallery', { method: 'POST', body: { ...form, mediaUrl, title: files.length > 1 ? `${form.title} ${ok + 1}` : form.title } })
           ok++
         } catch (e) { throw { data: { statusMessage: `${ok} dari ${files.length} foto berhasil. Gagal pada "${f.name}": ${msg(e)}` } } }

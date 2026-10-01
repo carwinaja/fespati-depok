@@ -63,9 +63,7 @@ async function onImage(ev: Event) {
   error.value = ''
   uploading.value = true
   try {
-    const fd = new FormData()
-    fd.append('file', file)
-    const { url } = await $fetch<{ url: string }>('/api/admin/upload', { method: 'POST', body: fd })
+    const url = await uploadImage(file)
     e().chain().focus().setImage({ src: url, alt: file.name.replace(/\.[^.]+$/, '') }).run()
   } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Gagal mengunggah gambar'

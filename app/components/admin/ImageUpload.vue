@@ -28,9 +28,7 @@ async function onPick(e: Event) {
   error.value = ''
   busy.value = true
   try {
-    const fd = new FormData()
-    fd.append('file', file)
-    const { url } = await $fetch<{ url: string }>('/api/admin/upload', { method: 'POST', body: fd })
+    const url = await uploadImage(file)
     emit('update:modelValue', url)
   } catch (err: any) {
     error.value = err?.data?.statusMessage || 'Gagal mengunggah'
