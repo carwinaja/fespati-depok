@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="head">
-      <p class="lead">{{ clubs?.length ?? 0 }} klub terdaftar.</p>
+      <p class="lead">{{ loading ? 'Memuat…' : `${clubs?.length ?? 0} klub terdaftar.` }}</p>
       <NuxtLink to="/admin/clubs/new" class="btn btn-primary">+ Tambah klub</NuxtLink>
     </div>
     <p v-if="error" class="alert-error" role="alert">{{ error }}</p>
@@ -9,7 +9,8 @@
       <table class="table">
         <thead><tr><th>Klub</th><th>Ketua</th><th>Lokasi</th><th>Anggota</th><th></th></tr></thead>
         <tbody>
-          <tr v-if="!clubs?.length"><td colspan="5" class="small">Belum ada klub.</td></tr>
+          <template v-if="loading"><tr v-for="n in 4" :key="n"><td v-for="c in 5" :key="c"><span class="skeleton"></span></td></tr></template>
+          <tr v-else-if="!clubs?.length"><td colspan="5" class="small">Belum ada klub.</td></tr>
           <tr v-for="c in clubs" :key="c.id">
             <td>
               <div class="cell-club">
@@ -36,7 +37,8 @@
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 useHead({ title: 'Klub — Admin FESPATI', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
-const { data: clubs, refresh } = await useFetch('/api/admin/clubs')
+const { data: clubs, refresh, status } = useFetch('/api/admin/clubs', { lazy: true })
+const loading = computed(() => status.value === 'pending' && !clubs.value)
 const error = ref('')
 
 async function remove(c: { id: string; name: string; _count: { members: number } }) {

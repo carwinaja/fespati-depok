@@ -62,6 +62,7 @@ model Event {
   location        String
   description     String?
   pdfUrl          String?
+  imageUrl        String?
   registrationUrl String?
   status          String    @default("UPCOMING")
   galleries       Gallery[]
@@ -108,4 +109,17 @@ model Article {
   updatedAt    DateTime @updatedAt
 
   @@index([publishedAt])
+}
+
+model HeroSlide {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  alt       String
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
 }

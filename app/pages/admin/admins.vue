@@ -19,6 +19,7 @@
       <table class="table">
         <thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th></th></tr></thead>
         <tbody>
+          <template v-if="loading"><tr v-for="n in 3" :key="n"><td v-for="c in 5" :key="c"><span class="skeleton"></span></td></tr></template>
           <tr v-for="a in admins" :key="a.id">
             <td>{{ a.name }}</td>
             <td>{{ a.email }}</td>
@@ -47,7 +48,8 @@ definePageMeta({
 useHead({ title: 'Pengelola — Admin FESPATI', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const { user } = useUserSession()
-const { data: admins, refresh } = await useFetch('/api/admin/admins')
+const { data: admins, refresh, status } = useFetch('/api/admin/admins', { lazy: true })
+const loading = computed(() => status.value === 'pending' && !admins.value)
 const form = reactive({ name: '', email: '', password: '', role: 'ADMIN' })
 const error = ref('')
 const busy = ref(false)

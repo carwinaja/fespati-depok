@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="head">
-      <p class="lead">{{ events?.length ?? 0 }} lomba & kegiatan.</p>
+      <p class="lead">{{ loading ? 'Memuat…' : `${events?.length ?? 0} lomba & kegiatan.` }}</p>
       <NuxtLink to="/admin/events/new" class="btn btn-primary">+ Tambah kegiatan</NuxtLink>
     </div>
     <p v-if="error" class="alert-error" role="alert">{{ error }}</p>
@@ -9,7 +9,8 @@
       <table class="table">
         <thead><tr><th>Kegiatan</th><th>Tanggal</th><th>Jenis</th><th>Status</th><th></th></tr></thead>
         <tbody>
-          <tr v-if="!events?.length"><td colspan="5" class="small">Belum ada kegiatan.</td></tr>
+          <template v-if="loading"><tr v-for="n in 4" :key="n"><td v-for="c in 5" :key="c"><span class="skeleton"></span></td></tr></template>
+          <tr v-else-if="!events?.length"><td colspan="5" class="small">Belum ada kegiatan.</td></tr>
           <tr v-for="e in events" :key="e.id">
             <td><strong>{{ e.title }}</strong><br /><span class="small">{{ e.location }}</span></td>
             <td>{{ new Date(e.eventDate).toLocaleDateString('id-ID', { dateStyle: 'medium' }) }}</td>
@@ -31,7 +32,8 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 useHead({ title: 'Lomba & Kegiatan — Admin FESPATI', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const statusLabel: Record<string, string> = { UPCOMING: 'Akan datang', ONGOING: 'Berlangsung', DONE: 'Selesai', CANCELLED: 'Dibatalkan' }
-const { data: events, refresh } = await useFetch('/api/admin/events')
+const { data: events, refresh, status } = useFetch('/api/admin/events', { lazy: true })
+const loading = computed(() => status.value === 'pending' && !events.value)
 const error = ref('')
 
 async function remove(e: { id: string; title: string; _count: { galleries: number } }) {

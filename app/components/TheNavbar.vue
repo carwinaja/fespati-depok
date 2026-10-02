@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="nav-wrapper">
     <!-- Backdrop overlay on mobile when menu is open -->
     <Transition name="fade">
       <div v-if="mobileOpen" class="nav-overlay" @click="mobileOpen = false"></div>
@@ -95,6 +95,11 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Wrapper tidak boleh membatasi area sticky */
+.nav-wrapper {
+  display: contents;
 }
 
 /* Sticky Navbar Header */

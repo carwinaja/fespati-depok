@@ -11,6 +11,7 @@ export const eventBody = z.object({
   location: z.string().trim().min(2).max(200),
   description: nullable(z.string().trim().max(5000)),
   pdfUrl: z.union([z.literal(''), z.string().regex(mediaPath), z.string().url()]).nullable().optional().transform((v) => v || null),
+  imageUrl: z.union([z.literal(''), z.string().regex(mediaPath)]).nullable().optional().transform((v) => v || null),
   registrationUrl: optionalUrl,
   status: z.enum(['UPCOMING', 'ONGOING', 'DONE', 'CANCELLED']).default('UPCOMING'),
 })

@@ -30,7 +30,6 @@
 
 <script setup lang="ts">
 const trustItems = [
-  'Gratis & tanpa biaya pendaftaran',
   'Pelatih berpengalaman',
   'Komunitas yang ramah & supportif',
 ]

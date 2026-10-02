@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="head">
-      <p class="lead">{{ articles?.length ?? 0 }} artikel.</p>
+      <p class="lead">{{ loading ? 'Memuat…' : `${articles?.length ?? 0} artikel.` }}</p>
       <NuxtLink to="/admin/articles/new" class="btn btn-primary">+ Tulis artikel</NuxtLink>
     </div>
     <p v-if="error" class="alert-error" role="alert">{{ error }}</p>
@@ -9,7 +9,8 @@
       <table class="table">
         <thead><tr><th>Judul</th><th>Kategori</th><th>Status</th><th>Tanggal</th><th></th></tr></thead>
         <tbody>
-          <tr v-if="!articles?.length"><td colspan="5" class="small">Belum ada artikel.</td></tr>
+          <template v-if="loading"><tr v-for="n in 4" :key="n"><td v-for="c in 5" :key="c"><span class="skeleton"></span></td></tr></template>
+          <tr v-else-if="!articles?.length"><td colspan="5" class="small">Belum ada artikel.</td></tr>
           <tr v-for="a in articles" :key="a.id">
             <td><strong>{{ a.title }}</strong><span v-if="a.isFeatured" class="badge badge-gold" style="margin-left:.5rem">Unggulan</span></td>
             <td>{{ a.category }}</td>
@@ -31,7 +32,8 @@
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 useHead({ title: 'Artikel — Admin FESPATI', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
-const { data: articles, refresh } = await useFetch('/api/admin/articles')
+const { data: articles, refresh, status } = useFetch('/api/admin/articles', { lazy: true })
+const loading = computed(() => status.value === 'pending' && !articles.value)
 const error = ref('')
 
 async function remove(a: { id: string; title: string }) {
