@@ -61,6 +61,10 @@
         <p class="small">© 2026 FESPATI Depok. Seluruh hak dilindungi.</p>
         <p class="small">Federasi Panahan Tradisional Indonesia — Kota Depok</p>
       </div>
+      <p class="small powered-by">
+        Powered by
+        <a href="https://otomatisin.web.id" target="_blank" rel="noopener noreferrer">Otomatisin</a>
+      </p>
     </div>
   </footer>
 </template>
@@ -168,6 +172,24 @@
 .footer-bottom .small {
   color: rgba(255,255,255,0.25);
   font-size: 0.75rem;
+}
+
+.powered-by {
+  text-align: center;
+  margin-top: 1rem;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.75rem;
+}
+
+.powered-by a {
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.powered-by a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
 @media (max-width: 900px) {
