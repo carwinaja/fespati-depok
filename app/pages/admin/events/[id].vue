@@ -22,6 +22,7 @@
           </select>
         </div>
       </div>
+      <div class="field"><label>Poster / thumbnail (opsional, tampil di agenda beranda)</label><AdminImageUpload v-model="form.imageUrl" /></div>
       <div class="field"><label for="reg">Link pendaftaran</label><input id="reg" v-model="form.registrationUrl" type="url" class="input" placeholder="https://…" /></div>
       <div class="field"><label>Dokumen (technical meeting / juknis, PDF)</label><AdminPdfUpload v-model="form.pdfUrl" /></div>
       <div class="field"><label for="desc">Deskripsi</label><textarea id="desc" v-model="form.description" class="input" rows="4" maxlength="5000"></textarea></div>
@@ -43,12 +44,12 @@ const toLocal = (iso: string) => { const d = new Date(iso); d.setMinutes(d.getMi
 
 const form = reactive({
   title: '', eventDate: '', location: '', type: 'INTERNAL', status: 'UPCOMING',
-  registrationUrl: '' as string | null, pdfUrl: null as string | null, description: '' as string | null,
+  registrationUrl: '' as string | null, pdfUrl: null as string | null, imageUrl: null as string | null, description: '' as string | null,
 })
 if (ev.value) {
   const e = ev.value
   Object.assign(form, { title: e.title, eventDate: toLocal(e.eventDate), location: e.location, type: e.type, status: e.status,
-    registrationUrl: e.registrationUrl ?? '', pdfUrl: e.pdfUrl, description: e.description ?? '' })
+    registrationUrl: e.registrationUrl ?? '', pdfUrl: e.pdfUrl, imageUrl: e.imageUrl, description: e.description ?? '' })
 }
 
 const error = ref('')
