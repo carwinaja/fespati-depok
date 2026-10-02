@@ -38,6 +38,7 @@ const nav = computed(() => [
   { to: '/admin', label: 'Dashboard', exact: true },
   { to: '/admin/clubs', label: 'Klub & Anggota' },
   { to: '/admin/events', label: 'Lomba & Kegiatan' },
+  { to: '/admin/hero', label: 'Slider Hero' },
   { to: '/admin/gallery', label: 'Galeri' },
   { to: '/admin/articles', label: 'Berita & Edukasi' },
   ...(user.value?.role === 'SUPER_ADMIN' ? [{ to: '/admin/admins', label: 'Pengelola' }] : []),
@@ -82,6 +83,10 @@ async function logout() {
 .table { width: 100%; border-collapse: collapse; font-size: .875rem; }
 .table th { text-align: left; font-size: .6875rem; letter-spacing: .08em; text-transform: uppercase; color: var(--color-ink-3); padding: .6rem .75rem; border-bottom: 1px solid var(--color-border); }
 .table td { padding: .7rem .75rem; border-bottom: 1px solid var(--color-border-soft); }
+.skeleton { display: block; height: .9em; min-width: 3rem; border-radius: 6px; background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-border-soft) 50%, var(--color-surface-2) 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.2s ease-in-out infinite; }
+.skeleton-block { height: 5.5rem; border-radius: var(--radius-lg); }
+@keyframes skeleton-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 .btn-sm { padding: .35rem .8rem; }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 

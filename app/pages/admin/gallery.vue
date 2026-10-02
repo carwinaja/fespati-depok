@@ -46,8 +46,11 @@
     <div class="filters">
       <button v-for="f in filters" :key="f.v" type="button" class="chip" :class="{ on: filter === f.v }" @click="filter = f.v">{{ f.l }}</button>
     </div>
-    <p v-if="!shown.length" class="small">Belum ada item.</p>
-    <div class="items">
+    <div v-if="loading" class="items">
+      <div v-for="n in 4" :key="n" class="skeleton skeleton-block"></div>
+    </div>
+    <p v-else-if="!shown.length" class="small">Belum ada item.</p>
+    <div v-if="!loading" class="items">
       <div v-for="g in shown" :key="g.id" class="panel item">
         <img v-if="g.mediaType === 'PHOTO' && g.mediaUrl" :src="g.mediaUrl" :alt="g.title" class="thumb" loading="lazy" />
         <img v-else-if="ytThumb(g.youtubeUrl)" :src="ytThumb(g.youtubeUrl)!" :alt="g.title" class="thumb" loading="lazy" />
@@ -69,8 +72,9 @@
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 useHead({ title: 'Galeri — Admin FESPATI', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
-const { data: items, refresh } = await useFetch('/api/admin/gallery')
-const { data: events } = await useFetch('/api/admin/events')
+const { data: items, refresh, status } = useFetch('/api/admin/gallery', { lazy: true })
+const { data: events } = useFetch('/api/admin/events', { lazy: true })
+const loading = computed(() => status.value === 'pending' && !items.value)
 
 const blank = () => ({ title: '', category: '', mediaType: 'PHOTO' as 'PHOTO' | 'VIDEO', mediaUrl: null as string | null, youtubeUrl: '' as string | null, description: '' as string | null, eventId: '' as string | null })
 const form = reactive(blank())
