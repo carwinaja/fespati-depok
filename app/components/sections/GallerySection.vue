@@ -26,34 +26,48 @@
       <p v-if="!filteredPhotos.length" class="small" style="text-align:center">Galeri segera hadir.</p>
       <div class="photo-grid">
         <div
-          v-for="(photo, i) in filteredPhotos"
-          :key="i"
+          v-for="(photo, i) in visiblePhotos"
+          :key="photo.src || i"
           class="photo-item"
-          :class="photo.size"
           role="button"
           tabindex="0"
           :aria-label="`Lihat foto ${photo.caption}`"
-          @click="openLightbox(photo)"
-          @keypress.enter="openLightbox(photo)"
+          @click="openLightbox(i)"
+          @keypress.enter="openLightbox(i)"
         >
           <div class="photo-bg" :style="{ background: photo.color || 'var(--color-surface-2)' }">
-            <img v-if="photo.src" :src="photo.src" :alt="photo.caption" loading="lazy" class="photo-img" />
+            <img v-if="photo.src" :src="photo.src" :alt="photo.caption" loading="lazy" decoding="async" class="photo-img" />
             <span v-else class="photo-emoji" aria-hidden="true">{{ photo.emoji }}</span>
-            <div class="photo-overlay">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <div class="photo-caption">
+              <span class="badge badge-brand">{{ photo.category }}</span>
+              <p class="photo-title">{{ photo.caption }}</p>
             </div>
-          </div>
-          <div class="photo-caption">
-            <span class="badge badge-brand">{{ photo.category }}</span>
-            <p class="photo-title">{{ photo.caption }}</p>
           </div>
         </div>
       </div>
 
+      <div v-if="remaining > 0" class="galeri-more">
+        <button class="btn btn-outline" @click="visibleCount += pageSize">
+          Lihat lebih banyak ({{ remaining }})
+        </button>
+      </div>
+
       <!-- Lightbox -->
       <Teleport to="body">
-        <div v-if="lightboxPhoto" class="lightbox" @click.self="closeLightbox" aria-modal="true" role="dialog" aria-label="Lightbox foto">
+        <div
+          v-if="lightboxPhoto"
+          class="lightbox"
+          aria-modal="true"
+          role="dialog"
+          aria-label="Lightbox foto"
+          @click.self="closeLightbox"
+          @touchstart.passive="onTouchStart"
+          @touchend.passive="onTouchEnd"
+        >
           <button class="lightbox-close" @click="closeLightbox" aria-label="Tutup">✕</button>
+          <span class="lightbox-counter">{{ lightboxIndex + 1 }} / {{ filteredPhotos.length }}</span>
+          <button v-if="filteredPhotos.length > 1" class="lightbox-nav prev" @click="step(-1)" aria-label="Foto sebelumnya">‹</button>
+          <button v-if="filteredPhotos.length > 1" class="lightbox-nav next" @click="step(1)" aria-label="Foto berikutnya">›</button>
           <div class="lightbox-content">
             <div class="lightbox-media">
               <img v-if="lightboxPhoto.src" :src="lightboxPhoto.src" :alt="lightboxPhoto.caption" class="lightbox-img-real" />
@@ -92,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 interface Photo { category: string; caption: string; src?: string | null; emoji?: string; color?: string; size?: string }
 
@@ -117,17 +131,57 @@ const filteredPhotos = computed(() =>
   activeCategory.value === 'Semua' ? allPhotos.value : allPhotos.value.filter((p) => p.category === activeCategory.value),
 )
 
-const lightboxPhoto = ref<Photo | null>(null)
+const pageSize = ref(12)
+const visibleCount = ref(12)
+const visiblePhotos = computed(() => filteredPhotos.value.slice(0, visibleCount.value))
+const remaining = computed(() => Math.max(0, filteredPhotos.value.length - visibleCount.value))
 
-function openLightbox(photo: Photo) {
-  lightboxPhoto.value = photo
+onMounted(() => {
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    pageSize.value = 8
+    visibleCount.value = 8
+  }
+})
+
+watch(activeCategory, () => { visibleCount.value = pageSize.value })
+
+const lightboxIndex = ref(-1)
+const lightboxPhoto = computed<Photo | null>(() => filteredPhotos.value[lightboxIndex.value] ?? null)
+
+function openLightbox(index: number) {
+  lightboxIndex.value = index
   document.body.style.overflow = 'hidden'
 }
 
 function closeLightbox() {
-  lightboxPhoto.value = null
+  lightboxIndex.value = -1
   document.body.style.overflow = ''
 }
+
+function step(dir: number) {
+  const n = filteredPhotos.value.length
+  lightboxIndex.value = (lightboxIndex.value + dir + n) % n
+}
+
+function onKey(e: KeyboardEvent) {
+  if (!lightboxPhoto.value) return
+  if (e.key === 'Escape') closeLightbox()
+  else if (e.key === 'ArrowLeft') step(-1)
+  else if (e.key === 'ArrowRight') step(1)
+}
+
+let touchX = 0
+function onTouchStart(e: TouchEvent) { touchX = e.touches[0].clientX }
+function onTouchEnd(e: TouchEvent) {
+  const dx = e.changedTouches[0].clientX - touchX
+  if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1)
+}
+
+onMounted(() => window.addEventListener('keydown', onKey))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKey)
+  document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
@@ -142,8 +196,11 @@ function closeLightbox() {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.galeri-filter::-webkit-scrollbar { display: none; }
 
 .filter-btn {
   padding: 0.4rem 1rem;
@@ -153,6 +210,8 @@ function closeLightbox() {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-ink-2);
+  flex-shrink: 0;
+  white-space: nowrap;
   cursor: pointer;
   transition: all var(--transition);
 }
@@ -167,11 +226,12 @@ function closeLightbox() {
 /* Photo grid */
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 220px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 180px;
   gap: 0.75rem;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
+.galeri-more { text-align: center; margin-bottom: 3rem; }
 
 .photo-item {
   border-radius: var(--radius-lg);
@@ -186,10 +246,6 @@ function closeLightbox() {
 .photo-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-}
-
-.photo-item.span-2 {
-  grid-column: span 2;
 }
 
 .photo-bg {
@@ -220,33 +276,25 @@ function closeLightbox() {
 
 .photo-item:hover .photo-emoji { transform: scale(1.1); }
 
-.photo-overlay {
+.photo-caption {
   position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
+  left: 0; right: 0; bottom: 0;
+  padding: 1.5rem 0.6rem 0.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   opacity: 0;
   transition: opacity var(--transition);
-  color: white;
-  backdrop-filter: blur(2px);
 }
-
-.photo-item:hover .photo-overlay { opacity: 1; }
-
-.photo-caption {
-  background: var(--color-surface);
-  padding: 0.6rem 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-top: 1px solid var(--color-border-soft);
-}
+.photo-item:hover .photo-caption,
+.photo-item:focus-visible .photo-caption { opacity: 1; }
 
 .photo-title {
   font-size: 0.75rem;
-  color: var(--color-ink-2);
+  color: white;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -290,6 +338,33 @@ function closeLightbox() {
   transition: background var(--transition);
   z-index: 1000;
 }
+
+.lightbox-counter {
+  position: absolute;
+  top: 1.75rem;
+  left: 1.5rem;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.875rem;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1000;
+}
+.lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+.lightbox-nav.prev { left: 1rem; }
+.lightbox-nav.next { right: 1rem; }
 
 .lightbox-close:hover { background: rgba(255,255,255,0.3); }
 
@@ -344,12 +419,21 @@ function closeLightbox() {
 
 /* Video */
 .video-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
 }
 
-.video-card { overflow: hidden; display: flex; flex-direction: column; }
+.video-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 min(280px, 78%);
+  scroll-snap-align: start;
+}
 
 .video-thumb {
   height: 140px;
@@ -401,14 +485,17 @@ function closeLightbox() {
   gap: 0.3rem;
 }
 
-@media (max-width: 768px) {
-  .photo-grid { grid-template-columns: repeat(2, 1fr); }
-  .photo-item.span-2 { grid-column: span 1; }
-  .video-grid { grid-template-columns: 1fr; }
+@media (max-width: 1024px) {
+  .photo-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (max-width: 480px) {
-  .photo-grid { grid-template-columns: 1fr; }
+@media (max-width: 768px) {
+  .photo-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; gap: 0.5rem; }
+  /* touch: caption selalu terlihat */
+  .photo-caption { opacity: 1; }
+  .lightbox-nav { width: 38px; height: 38px; }
+  .lightbox-nav.prev { left: 0.5rem; }
+  .lightbox-nav.next { right: 0.5rem; }
 }
 .video-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .video-thumb .play-btn { position: relative; z-index: 1; }
