@@ -13,3 +13,5 @@ export const clubBody = z.object({
   mapUrl: optionalUrl,
   colorHex: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional().or(z.literal('').transform(() => null)),
 })
+
+export const clubReorderBody = z.object({ ids: z.array(z.string()).min(1) })
