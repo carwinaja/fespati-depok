@@ -34,24 +34,24 @@
         <div class="footer-col">
           <h4 class="footer-heading">Tentang</h4>
           <ul>
-            <li><a href="#tentang">Profil FESPATI Depok</a></li>
-            <li><a href="#tentang">Struktur Pengurus</a></li>
-            <li><a href="#tentang">Alamat Sekretariat</a></li>
+            <li><a href="/#tentang">Profil FESPATI Depok</a></li>
+            <li><a href="/#tentang">Struktur Pengurus</a></li>
+            <li><a href="/#tentang">Alamat Sekretariat</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4 class="footer-heading">Komunitas</h4>
           <ul>
-            <li><a href="#klub">Daftar Klub</a></li>
-            <li><a href="#daftar">Cara Daftar Anggota</a></li>
+            <li><a href="/#klub">Daftar Klub</a></li>
+            <li><a href="/#daftar">Cara Daftar Anggota</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4 class="footer-heading">Kegiatan</h4>
           <ul>
-            <li><a href="#agenda">Agenda & Lomba</a></li>
-            <li><a href="#galeri">Galeri Foto</a></li>
-            <li><a href="#berita">Berita & Edukasi</a></li>
+            <li><a href="/#agenda">Agenda & Lomba</a></li>
+            <li><a href="/#galeri">Galeri Foto</a></li>
+            <li><a href="/#berita">Berita & Edukasi</a></li>
           </ul>
         </div>
       </div>

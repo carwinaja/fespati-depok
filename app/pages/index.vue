@@ -7,6 +7,7 @@
       <GallerySection />
       <AgendaSection />
       <ClubsSection />
+      <JoinSection />
       <AboutSection />
       <NewsSection />
       <CtaBanner />
