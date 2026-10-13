@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils', '@nuxt/fonts'],
+  modules: ['nuxt-auth-utils', '@nuxt/fonts', '@vercel/speed-insights'],
   srcDir: 'app/',
   serverDir: 'server',
   components: [
