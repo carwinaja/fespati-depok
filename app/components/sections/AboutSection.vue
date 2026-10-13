@@ -67,15 +67,45 @@
       <!-- Pengurus -->
       <div class="pengurus-section">
         <h3 class="h3" style="text-align:center; margin-bottom:1.75rem">Struktur Pengurus</h3>
-        <div class="pengurus-grid">
-          <div v-for="p in pengurus" :key="p.nama" class="pengurus-card card">
-            <div class="pengurus-avatar" :style="{ background: p.color }">
-              {{ p.initials }}
-            </div>
+
+        <!-- Pengurus inti -->
+        <div class="inti">
+          <div class="pengurus-card card ketua">
+            <div class="pengurus-avatar" :style="{ background: ketua.color }">{{ initials(ketua.nama) }}</div>
             <div class="pengurus-info">
-              <p class="pengurus-nama">{{ p.nama }}</p>
-              <p class="pengurus-jabatan">{{ p.jabatan }}</p>
+              <p class="pengurus-nama">{{ ketua.nama }}</p>
+              <p class="pengurus-jabatan">{{ ketua.jabatan }}</p>
             </div>
+          </div>
+          <div class="inti-row">
+            <div v-for="p in inti" :key="p.nama" class="pengurus-card card">
+              <div class="pengurus-avatar" :style="{ background: p.color }">{{ initials(p.nama) }}</div>
+              <div class="pengurus-info">
+                <p class="pengurus-nama">{{ p.nama }}</p>
+                <p class="pengurus-jabatan">{{ p.jabatan }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bidang: accordion di mobile, selalu terbuka di desktop -->
+        <div class="bidang-grid">
+          <div v-for="(b, i) in bidang" :key="b.nama" class="bidang-card card" :class="{ open: openBidang.has(i) }">
+            <button
+              class="bidang-head"
+              :aria-expanded="openBidang.has(i)"
+              :aria-controls="`bidang-${i}`"
+              @click="toggleBidang(i)"
+            >
+              <span class="bidang-nama">{{ b.nama }}</span>
+              <svg class="bidang-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul :id="`bidang-${i}`" class="bidang-body">
+              <li v-for="n in b.anggota" :key="n">
+                <span class="bidang-avatar" aria-hidden="true">{{ initials(n) }}</span>
+                {{ n }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -84,16 +114,31 @@
 </template>
 
 <script setup lang="ts">
-const pengurus = [
-  { nama: 'Bani Magribi', jabatan: 'Ketua', initials: 'BM', color: '#1A5C38' },
-  { nama: 'Anne Rufaidah', jabatan: 'Sekretaris', initials: 'AR', color: '#2E7D52' },
-  { nama: 'Hari Azhari', jabatan: 'Bendahara', initials: 'HA', color: '#C89B3C' },
-  { nama: 'Mochammad Effendy & Rika Yustini', jabatan: 'Bidang Organisasi', initials: 'MR', color: '#4A90A4' },
-  { nama: 'Ridjalena & Muzni Ikhsan', jabatan: 'Bidang Pembinaan & Prestasi', initials: 'RM', color: '#8B4513' },
-  { nama: 'Yuus Sadaputra & Tsabit Arra\'id', jabatan: 'Bidang Humas & Sosial Media', initials: 'YT', color: '#6B5B95' },
-  { nama: 'Carwin & Daris Muji Santoso', jabatan: 'Bidang Litbang', initials: 'CD', color: '#6B5B95' },
-  { nama: 'Faisal Yudho Prabowo & Andriningrum Sarnoko', jabatan: 'Bidang Perwasitan & Perlombaan', initials: 'FA', color: '#6B5B95' },
+import { ref } from 'vue'
+
+const ketua = { nama: 'Bani Magribi', jabatan: 'Ketua', color: '#1A5C38' }
+const inti = [
+  { nama: 'Anne Rufaidah', jabatan: 'Sekretaris', color: '#2E7D52' },
+  { nama: 'Hari Azhari', jabatan: 'Bendahara', color: '#C89B3C' },
 ]
+const bidang = [
+  { nama: 'Bidang Organisasi', anggota: ['Mochammad Effendy', 'Rika Yustini'] },
+  { nama: 'Bidang Pembinaan & Prestasi', anggota: ['Ridjalena', 'Muzni Ikhsan'] },
+  { nama: 'Bidang Humas & Sosial Media', anggota: ['Yuus Sadaputra', 'Tsabit Arra\'id'] },
+  { nama: 'Bidang Litbang', anggota: ['Carwin', 'Daris Muji Santoso'] },
+  { nama: 'Bidang Perwasitan & Perlombaan', anggota: ['Faisal Yudho Prabowo', 'Andriningrum Sarnoko'] },
+]
+
+const initials = (nama: string) =>
+  nama.split(/\s+/).slice(0, 2).map((w) => w.charAt(0)).join('').toUpperCase()
+
+// Hanya berpengaruh di mobile; di desktop daftar selalu tampil lewat CSS
+const openBidang = ref(new Set<number>())
+function toggleBidang(i: number) {
+  const next = new Set(openBidang.value)
+  next.has(i) ? next.delete(i) : next.add(i)
+  openBidang.value = next
+}
 </script>
 
 <style scoped>
@@ -208,10 +253,29 @@ const pengurus = [
 }
 
 /* Pengurus */
-.pengurus-grid {
+.inti { display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; }
+
+.ketua {
+  width: min(100%, 320px);
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+/* garis penghubung ketua -> sekretaris & bendahara */
+.ketua::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 1.5rem;
+  background: var(--color-border);
+}
+
+.inti-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  width: min(100%, 640px);
 }
 
 .pengurus-card {
@@ -246,14 +310,71 @@ const pengurus = [
   margin-top: 0.15rem;
 }
 
+/* Bidang */
+.bidang-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+.bidang-card { grid-column: span 2; padding: 1rem 1.25rem; }
+/* 5 kartu: baris kedua (2 kartu) dipusatkan */
+.bidang-card:nth-child(4) { grid-column: 2 / span 2; }
+.bidang-card:nth-child(5) { grid-column: 4 / span 2; }
+
+.bidang-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: default;
+  color: inherit;
+}
+.bidang-nama { font-size: 0.875rem; font-weight: 700; color: var(--color-brand); }
+.bidang-chevron { display: none; transition: transform var(--transition); color: var(--color-ink-3); flex-shrink: 0; }
+
+.bidang-body { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.bidang-body li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.875rem; color: var(--color-ink-2); }
+.bidang-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 @media (max-width: 900px) {
   .about-grid { grid-template-columns: 1fr; }
   .secretariat { grid-template-columns: 1fr; }
   .sec-map { min-height: 150px; border-left: none; border-top: 1px solid var(--color-border-soft); }
-  .pengurus-grid { grid-template-columns: repeat(2, 1fr); }
+  .bidang-grid { grid-template-columns: repeat(2, 1fr); }
+  .bidang-card,
+  .bidang-card:nth-child(4),
+  .bidang-card:nth-child(5) { grid-column: auto; }
 }
 
-@media (max-width: 500px) {
-  .pengurus-grid { grid-template-columns: 1fr; }
+/* Mobile: accordion */
+@media (max-width: 768px) {
+  .bidang-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+  .bidang-card { padding: 0; }
+  .bidang-head { padding: 0.9rem 1rem; min-height: 48px; cursor: pointer; }
+  .bidang-chevron { display: block; }
+  .bidang-card.open .bidang-chevron { transform: rotate(180deg); }
+  .bidang-body { display: none; margin: 0; padding: 0 1rem 1rem; }
+  .bidang-card.open .bidang-body { display: grid; }
+
+  .inti-row { gap: 0.5rem; }
+  .pengurus-card { padding: 0.85rem; }
+  .inti-row .pengurus-card { flex-direction: column; text-align: center; gap: 0.5rem; }
 }
 </style>
