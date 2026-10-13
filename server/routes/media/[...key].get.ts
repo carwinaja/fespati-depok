@@ -14,6 +14,12 @@ export default defineEventHandler(async (event) => {
     if (res.ContentLength) setHeader(event, 'Content-Length', res.ContentLength)
     setHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
     setHeader(event, 'X-Content-Type-Options', 'nosniff')
+    // Dokumen selain PDF/gambar diunduh; nama file asli ada setelah awalan acak di key.
+    const type = res.ContentType || ''
+    if (!/^(application\/pdf|image\/)/.test(type)) {
+      const name = key.split('/').pop()!.replace(/^[0-9a-f]{8}_/, '')
+      setHeader(event, 'Content-Disposition', `attachment; filename="${name}"`)
+    }
     return sendStream(event, res.Body as Readable)
   } catch (e: any) {
     if (e?.name === 'NoSuchKey' || e?.$metadata?.httpStatusCode === 404) throw createError({ statusCode: 404 })

@@ -21,6 +21,24 @@
           <a v-for="item in navItems" :key="item.href" :href="item.href" class="nav-link" @click="mobileOpen = false">
             {{ item.label }}
           </a>
+
+          <!-- Curation: submenu dari halaman yang dibuat admin -->
+          <div v-if="curations.length" ref="curationEl" class="nav-dropdown" :class="{ open: curationOpen }">
+            <button
+              class="nav-link nav-drop-btn"
+              :aria-expanded="curationOpen"
+              aria-haspopup="true"
+              @click="curationOpen = !curationOpen"
+            >
+              Curation
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="nav-drop-menu">
+              <li v-for="c in curations" :key="c.id">
+                <NuxtLink :to="`/curation/${c.slug}`" class="nav-drop-link" @click="closeAll">{{ c.title }}</NuxtLink>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Mobile Toggle Button -->
@@ -44,14 +62,30 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const mobileOpen = ref(false)
+const curationOpen = ref(false)
+const curationEl = ref<HTMLElement | null>(null)
+
+// Gagal memuat submenu tidak boleh merusak halaman; menu Curation hanya tidak tampil.
+const { data: curationData } = await useFetch<{ id: string; title: string; slug: string }[]>('/api/curations', { key: 'nav-curations' })
+const curations = computed(() => curationData.value ?? [])
+
+function closeAll() {
+  curationOpen.value = false
+  mobileOpen.value = false
+}
+
+function onDocClick(e: MouseEvent) {
+  if (curationOpen.value && curationEl.value && !curationEl.value.contains(e.target as Node)) curationOpen.value = false
+}
+function onKey(e: KeyboardEvent) { if (e.key === 'Escape') curationOpen.value = false }
 const isScrolled = ref(false)
 
 const navItems = [
-  { label: 'Galeri', href: '#galeri' },
-  { label: 'Agenda', href: '#agenda' },
-  { label: 'Klub & Anggota', href: '#klub' },
-  { label: 'Tentang Kami', href: '#tentang' },
-  { label: 'Berita', href: '#berita' },
+  { label: 'Galeri', href: '/#galeri' },
+  { label: 'Agenda', href: '/#agenda' },
+  { label: 'Klub & Anggota', href: '/#klub' },
+  { label: 'Tentang Kami', href: '/#tentang' },
+  { label: 'Berita', href: '/#berita' },
 ]
 
 function onScroll() {
@@ -66,10 +100,14 @@ watch(mobileOpen, (val) => {
 
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  document.addEventListener('click', onDocClick)
+  document.addEventListener('keydown', onKey)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
+  document.removeEventListener('click', onDocClick)
+  document.removeEventListener('keydown', onKey)
   if (typeof document !== 'undefined') {
     document.body.style.overflow = ''
   }
@@ -189,6 +227,50 @@ onUnmounted(() => {
   color: var(--color-brand);
 }
 
+/* Dropdown Curation */
+.nav-dropdown { position: relative; }
+
+.nav-drop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.nav-drop-btn svg { transition: transform var(--transition); }
+.nav-dropdown.open .nav-drop-btn { color: var(--color-brand); }
+.nav-dropdown.open .nav-drop-btn svg { transform: rotate(180deg); }
+
+.nav-drop-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  min-width: 220px;
+  max-width: 320px;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+.nav-dropdown.open .nav-drop-menu { display: block; }
+
+.nav-drop-link {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--color-ink-2);
+  text-decoration: none;
+}
+.nav-drop-link:hover { background: var(--color-brand-soft); color: var(--color-brand); }
+
 /* Mobile Toggle Button */
 .mobile-toggle {
   display: none;
@@ -285,5 +367,21 @@ onUnmounted(() => {
   .nav-link:last-of-type {
     border-bottom: none;
   }
+
+  .nav-dropdown { width: 100%; }
+  .nav-drop-btn {
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+  }
+  .nav-drop-menu {
+    position: static;
+    max-width: none;
+    border: none;
+    box-shadow: none;
+    padding: 0 0 0.5rem 1rem;
+    background: transparent;
+  }
+  .nav-drop-link { font-size: 1rem; padding: 0.75rem 0; }
 }
 </style>

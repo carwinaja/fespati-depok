@@ -126,3 +126,32 @@ model HeroSlide {
 
   @@index([isActive, sortOrder])
 }
+
+model Curation {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  description String?
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(false)
+  files       CurationFile[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([isPublished, sortOrder])
+}
+
+model CurationFile {
+  id         String   @id @default(uuid())
+  curationId String
+  curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
+  title      String
+  fileName   String
+  fileUrl    String
+  mimeType   String
+  size       Int
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([curationId, sortOrder])
+}

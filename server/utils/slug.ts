@@ -20,3 +20,13 @@ export async function uniqueArticleSlug(base: string, excludeId?: string) {
     slug = `${root}-${i}`
   }
 }
+
+export async function uniqueCurationSlug(base: string, excludeId?: string) {
+  const root = slugify(base)
+  let slug = root
+  for (let i = 2; ; i++) {
+    const hit = await prisma.curation.findUnique({ where: { slug }, select: { id: true } })
+    if (!hit || hit.id === excludeId) return slug
+    slug = `${root}-${i}`
+  }
+}

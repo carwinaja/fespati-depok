@@ -43,6 +43,7 @@ export default defineNuxtConfig({
     // Halaman publik disajikan dari CDN (ISR) agar tidak kena cold start / render per kunjungan
     '/': { isr: 60 },
     '/berita/**': { isr: 300 },
+    '/curation/**': { isr: 300 },
     // Aset statis di public/ (nama tidak ber-hash): cache 7 hari
     '/hero-fespati.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
     '/fespati.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },

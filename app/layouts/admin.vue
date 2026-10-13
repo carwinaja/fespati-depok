@@ -41,6 +41,7 @@ const nav = computed(() => [
   { to: '/admin/hero', label: 'Slider Hero' },
   { to: '/admin/gallery', label: 'Galeri' },
   { to: '/admin/articles', label: 'Berita & Edukasi' },
+  { to: '/admin/curations', label: 'Curation' },
   ...(user.value?.role === 'SUPER_ADMIN' ? [{ to: '/admin/admins', label: 'Pengelola' }] : []),
 ])
 const title = computed(() => nav.value.find((n) => (n.exact ? route.path === n.to : route.path.startsWith(n.to)))?.label ?? 'Admin')
